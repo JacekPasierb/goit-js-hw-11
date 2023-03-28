@@ -14,7 +14,7 @@ const searchImages = e => {
       console.log('data', data); // data handling
     })
     .catch(error => {
-      // Error handling
+        console.log(error); // Error handling
     });
 };
 
