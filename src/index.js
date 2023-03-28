@@ -7,14 +7,18 @@ const searchImages = e => {
     e.preventDefault();
      let imageListHtml = '';
   let wordKey = input.value.trim().split(' ').join('+');
-
+    let page = 1;
+    const limit = 40;
+    
   fetch(
-    `https://pixabay.com/api/?key=34775826-8245aeb15fb52e6c04f01aeda&q=${wordKey}&image_type=photo&orientation=horizontal&safesearch=true&per_page=40`
+    `https://pixabay.com/api/?key=34775826-8245aeb15fb52e6c04f01aeda&q=${wordKey}&image_type=photo&orientation=horizontal&safesearch=true&page=2&per_page=40`
   )
     .then(fetchJsonToJs)
     .then(data => {
       console.log('data', data); // data handling
-        
+    
+        const totalPages = data.total / limit;
+        console.log(totalPages)
       if (data.total == 0) {
         Notiflix.Notify.info(
           'Sorry, there are no images matching your search query. Please try again.'
