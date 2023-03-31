@@ -2,6 +2,7 @@ import Notiflix from 'notiflix';
 const boxInputDOM = document.querySelector('.boxInput');
 const inputDOM = document.querySelector('input');
 const formDOM = document.querySelector('.search-form');
+const inputMoreDOM = document.querySelector('.load-more');
 
 let wordKey;
 const limit = 40;
@@ -11,25 +12,23 @@ const fetchImages = async () => {
     `https://pixabay.com/api/?key=34775826-8245aeb15fb52e6c04f01aeda&q=${wordKey}&image_type=photo&orientation=horizontal&safesearch=true&page=2&per_page=40`
   );
   const images = await response.json();
-  
+
   return images;
-}
+};
 const viewImages = async () => {
   try {
     const images = await fetchImages();
-    console.log("images",images);
+    console.log('images', images);
     //todo create image for users
-    let imageListHtml = "";
-        const totalPages = images.total / limit;
+    let imageListHtml = '';
+    const totalPages = images.total / limit;
     console.log(totalPages);
-    
+
     if (images.total == 0) {
       Notiflix.Notify.info(
         'Sorry, there are no images matching your search query. Please try again.'
       );
     } else {
-     
-
       images.hits.forEach(e => {
         imageListHtml += `<div class="photo-card">
               <img src="${e.webformatURL}" alt="${e.tags}" loading="lazy" />
@@ -49,33 +48,26 @@ const viewImages = async () => {
               </div>
             </div>`;
       });
-  
     }
     const galery = document.querySelector('.gallery');
     galery.innerHTML = imageListHtml;
   } catch (error) {
     console.log(error.message);
   }
-}
+};
 
 const searchImages = e => {
-    e.preventDefault();
-     let imageListHtml = '';
-    wordKey = inputDOM.value.trim().split(' ').join('+');
-    let page = 1;
-    
-  fetchImages(wordKey);
- 
-  viewImages();
-    
-     
-    
-      
-         
-    }
-    
-    
+  e.preventDefault();
+  let imageListHtml = '';
+  wordKey = inputDOM.value.trim().split(' ').join('+');
+  let page = 1;
 
+  fetchImages(wordKey);
+
+  viewImages();
+  inputMoreDOM.style.display = 'block';
+  // inputMoreDOM.addEventListener('click',);  todo let page pętla
+};
 
 formDOM.addEventListener('submit', searchImages);
 
