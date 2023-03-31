@@ -3,6 +3,7 @@ input {
   border: 0;
   outline: none;
   padding: 10px;
+  width: 100%;
 }
 .boxInput {
   height: 60px;
@@ -10,4 +11,25 @@ input {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+.search-form {
+  position: relative;
+}
+button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 3;
+  
+  height: 100%;
+  border-radius: 5px;
+  border: 0;
+  cursor: pointer;
+}
+
+.fa:hover {
+  color: blue;
+}
+.search-form input:focus + button .fa {
+  color: red;
 }
