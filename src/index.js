@@ -28,7 +28,7 @@ const viewImages = async () => {
         'Sorry, there are no images matching your search query. Please try again.'
       );
     } else {
-      // console.log('1', data);
+     
 
       images.hits.forEach(e => {
         imageListHtml += `<div class="photo-card">
