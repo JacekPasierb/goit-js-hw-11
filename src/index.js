@@ -5,8 +5,8 @@ import 'simplelightbox/dist/simple-lightbox.min.css';
 //-------------------------------DOM----------------------------------------
 const searchFormDOM = document.querySelector('.search-form');
 const inputSearchDOM = document.querySelector("[name='searchQuery']");
-const galleryDOM = document.querySelector(".gallery");
-const btnMoreDOM = document.querySelector(".load-more")
+const galleryDOM = document.querySelector('.gallery');
+const btnMoreDOM = document.querySelector('.load-more');
 //--------------------------------GLOBAL VARIABLES--------------------------
 const PIXABAY_URL = 'https://pixabay.com/api/';
 const PIXABAY_KEY = '34775826-8245aeb15fb52e6c04f01aeda';
@@ -45,7 +45,7 @@ const fetchImages = async () => {
 };
 
 const viewImages = async () => {
-  let imageListHtml = "";
+  let imageListHtml = '';
   try {
     const images = await fetchImages();
     console.log(images);
@@ -57,7 +57,7 @@ const viewImages = async () => {
     }
     Notiflix.Notify.success(`Hooray! We found ${images.totalHits} images.`);
     // Here end...
-    
+
     console.log(images.hits);
     imageListHtml = images.hits
       .map(image => {
@@ -88,8 +88,9 @@ const viewImages = async () => {
       `;
       })
       .join('');
-      galleryDOM.innerHTML = imageListHtml;
-      lightbox.refresh();
+    galleryDOM.innerHTML = imageListHtml;
+    
+    lightbox.refresh();
     btnMoreOn();
   } catch (error) {
     console.log(error.message);
@@ -107,8 +108,6 @@ const viewNextImages = async () => {
       );
       return;
     }
-    
-    
 
     console.log(nextImages.hits);
     imageListHtml = nextImages.hits
@@ -140,24 +139,22 @@ const viewNextImages = async () => {
       `;
       })
       .join('');
-      galleryDOM.insertAdjacentHTML('beforeend', imageListHtml);
-      lightbox.refresh();
-    
+    galleryDOM.insertAdjacentHTML('beforeend', imageListHtml);
+    scrollMoreLoad();
+    lightbox.refresh();
   } catch (error) {
     console.log(error.message);
   }
 };
 const loadMoreImages = async () => {
- console.log(page);
+  console.log(page);
   try {
-    
     const images = await fetchImages();
 
-  
     const totalImages = images.totalHits;
-    console.log("Wszystkich obrazów:", totalImages);
+    console.log('Wszystkich obrazów:', totalImages);
     const totalPages = Math.ceil(totalImages / IMG_PER_PAGE);
-    console.log("Wszystkich stron", totalPages);
+    console.log('Wszystkich stron', totalPages);
     if (page === totalPages) {
       btnMoreOf();
       Notiflix.Notify.info(
@@ -168,16 +165,27 @@ const loadMoreImages = async () => {
     page++;
     console.log(page);
     const nextImage = await fetchImages();
-    console.log("ret", nextImage);
+    console.log('ret', nextImage);
     viewNextImages();
     // fetchImages(wordKey, page);
     // viewImages();
   } catch (error) {
     console.log(error.message);
   }
-}
+};
 const btnMoreOn = () => (btnMoreDOM.style.display = 'block');
 const btnMoreOf = () => (btnMoreDOM.style.display = 'none');
+
+const scrollMoreLoad = () => {
+  const { height: cardHeight } = document
+    .querySelector('.gallery')
+    .firstElementChild.getBoundingClientRect();
+
+  window.scrollBy({
+    top: cardHeight * 1.55,
+    behavior: 'smooth',
+  });
+}
 //--------------------------------LISTNER ON SUBMIT---------------------------
-btnMoreDOM.addEventListener("click", loadMoreImages)
+btnMoreDOM.addEventListener('click', loadMoreImages);
 searchFormDOM.addEventListener('submit', searchImages);
