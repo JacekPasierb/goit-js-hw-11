@@ -2,6 +2,8 @@ import axios, { isCancel, AxiosError } from 'axios';
 import Notiflix from 'notiflix';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
+import debounce from 'lodash.debounce';
+
 //-------------------------------DOM----------------------------------------
 const searchFormDOM = document.querySelector('.search-form');
 const inputSearchDOM = document.querySelector("[name='searchQuery']");
@@ -48,7 +50,7 @@ const viewImages = async () => {
   let imageListHtml = '';
   try {
     const images = await fetchImages();
-    console.log(images);
+
     if (images.hits.length === 0) {
       Notiflix.Notify.failure(
         'Sorry, there are no images matching your search query. Please try again.'
@@ -56,9 +58,7 @@ const viewImages = async () => {
       return;
     }
     Notiflix.Notify.success(`Hooray! We found ${images.totalHits} images.`);
-    // Here end...
 
-    console.log(images.hits);
     imageListHtml = images.hits
       .map(image => {
         return `
@@ -89,9 +89,8 @@ const viewImages = async () => {
       })
       .join('');
     galleryDOM.innerHTML = imageListHtml;
-    
+
     lightbox.refresh();
-    btnMoreOn();
   } catch (error) {
     console.log(error.message);
   }
@@ -101,7 +100,7 @@ const viewNextImages = async () => {
   let imageListHtml = '';
   try {
     const nextImages = await fetchImages();
-    console.log(nextImages);
+
     if (nextImages.hits.length === 0) {
       Notiflix.Notify.failure(
         'Sorry, there are no images matching your search query. Please try again.'
@@ -109,7 +108,6 @@ const viewNextImages = async () => {
       return;
     }
 
-    console.log(nextImages.hits);
     imageListHtml = nextImages.hits
       .map(image => {
         return `
@@ -140,35 +138,31 @@ const viewNextImages = async () => {
       })
       .join('');
     galleryDOM.insertAdjacentHTML('beforeend', imageListHtml);
-    scrollMoreLoad();
+
     lightbox.refresh();
   } catch (error) {
     console.log(error.message);
   }
 };
 const loadMoreImages = async () => {
-  console.log(page);
   try {
     const images = await fetchImages();
 
     const totalImages = images.totalHits;
-    console.log('Wszystkich obrazów:', totalImages);
+
     const totalPages = Math.ceil(totalImages / IMG_PER_PAGE);
-    console.log('Wszystkich stron', totalPages);
+
     if (page === totalPages) {
-      btnMoreOf();
       Notiflix.Notify.info(
         "We're sorry, but you've reached the end of search results."
       );
       return;
     }
     page++;
-    console.log(page);
+
     const nextImage = await fetchImages();
-    console.log('ret', nextImage);
-    viewNextImages();
-    // fetchImages(wordKey, page);
-    // viewImages();
+
+    viewNextImages(nextImage);
   } catch (error) {
     console.log(error.message);
   }
@@ -176,16 +170,19 @@ const loadMoreImages = async () => {
 const btnMoreOn = () => (btnMoreDOM.style.display = 'block');
 const btnMoreOf = () => (btnMoreDOM.style.display = 'none');
 
-const scrollMoreLoad = () => {
-  const { height: cardHeight } = document
-    .querySelector('.gallery')
-    .firstElementChild.getBoundingClientRect();
-
-  window.scrollBy({
-    top: cardHeight * 1.55,
-    behavior: 'smooth',
-  });
-}
 //--------------------------------LISTNER ON SUBMIT---------------------------
 btnMoreDOM.addEventListener('click', loadMoreImages);
 searchFormDOM.addEventListener('submit', searchImages);
+
+window.addEventListener(
+  'scroll',
+  debounce(() => {
+    const imagesHiddenHeight =
+      document.documentElement.scrollHeight - window.innerHeight;
+    const scroll = window.scrollY;
+
+    if (scroll > imagesHiddenHeight - 500) {
+      loadMoreImages();
+    }
+  }, 300)
+);
